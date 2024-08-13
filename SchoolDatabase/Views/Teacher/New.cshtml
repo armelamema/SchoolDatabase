@@ -1,0 +1,110 @@
+﻿@model Tuple<IEnumerable<SchoolDatabase.Models.Teacher>, SchoolDatabase.Models.Teacher>
+
+@{
+    Layout = null;
+    ViewBag.Title = "Teacher Management";
+}
+
+<!DOCTYPE html>
+<html>
+<head>
+    <meta name="viewport" content="width=device-width" />
+    <title>@ViewBag.Title</title>
+    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css" />
+   
+</head>
+<body>
+    <div class="container">
+        <h2>@ViewBag.Title</h2>
+
+        <!-- Teacher List -->
+        <h3>Teacher List</h3>
+        <table class="table">
+            <thead>
+                <tr>
+                    <th>First Name</th>
+                    <th>Last Name</th>
+                    <th>Employee Number</th>
+                    <th>Hire Date</th>
+                    <th>Salary</th>
+                    <th>Actions</th>
+                </tr>
+            </thead>
+            <tbody>
+            <tbody>
+                @foreach (var teacher in Model.Item1)
+                {
+                    <tr>
+                        <td>@teacher.TeacherFname</td>
+                        <td>@teacher.TeacherLname</td>
+                        <td>@teacher.EmployeeNumber</td>
+                        <td>@teacher.HireDate.()</td>
+                        <td>@teacher.Salary.ToString()</td>
+                        <td>
+                            <button class="btn btn-danger delete-btn" data-id="@teacher.TeacherId">Delete</button>
+                        </td>
+                    </tr>
+                }
+            </tbody>
+        </table>
+
+        <!-- Add Teacher Form -->
+        <h3>Add New Teacher</h3>
+        <form asp-action="Create" method="post" id="addTeacherForm">
+            <div class="form-group">
+                <label asp-for="Item2.TeacherFname">First Name</label>
+                <input type="text" class="form-control" asp-for="Item2.TeacherFname" />
+                <span asp-validation-for="Item2.TeacherFname" class="text-danger"></span>
+            </div>
+            <div class="form-group">
+                <label asp-for="Item2.TeacherLname">Last Name</label>
+                <input type="text" class="form-control" asp-for="Item2.TeacherLname" />
+                <span asp-validation-for="Item2.TeacherLname" class="text-danger"></span>
+            </div>
+            <div class="form-group">
+                <label asp-for="Item2.EmployeeNumber">Employee Number</label>
+                <input type="text" class="form-control" asp-for="Item2.EmployeeNumber" />
+                <span asp-validation-for="Item2.EmployeeNumber" class="text-danger"></span>
+            </div>
+            <div class="form-group">
+                <label asp-for="Item2.HireDate">Hire Date</label>
+                <input type="date" class="form-control" asp-for="Item2.HireDate" />
+                <span asp-validation-for="Item2.HireDate" class="text-danger"></span>
+            </div>
+            <div class="form-group">
+                <label asp-for="Item2.Salary">Salary</label>
+                <input type="number" class="form-control" asp-for="Item2.Salary" step="0.01" />
+                <span asp-validation-for="Item2.Salary" class="text-danger"></span>
+            </div>
+            <button type="submit" class="btn btn-primary">Add Teacher</button>
+        </form>
+    </div>
+
+    @section Scripts {
+        <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+        <script>
+            $(document).ready(function () {
+                $(".delete-btn").click(function () {
+                    var teacherId = $(this).data("id");
+
+                    if (confirm("Are you sure you want to delete this teacher?")) {
+                        $.ajax({
+                            url: '/api/TeacherData/DeleteTeacher/' + teacherId,
+                            type: 'DELETE',
+                            success: function () {
+                                window.location.reload(); 
+                            },
+                            error: function (xhr, status, error) {
+                                console.error("Error deleting teacher:", error); 
+                            }
+                        });
+                    }
+                });
+            });
+        </script>
+    }
+</body>
+</html>
+    }
+</body>
+</html>

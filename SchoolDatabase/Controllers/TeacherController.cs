@@ -31,5 +31,34 @@ namespace SchoolDatabase.Controllers
             Teacher NewTeacher = controller.FindTeacher(id);
             return View(NewTeacher);
         }
+        // GET: Teacher/New
+        public ActionResult New()
+        {
+            // You can pass any necessary data to the view if needed
+            return View();
+        }
+
+        // GET: Teacher/Delete/{id}
+        public ActionResult Delete(int id)
+        {
+            TeacherDataController controller = new TeacherDataController();
+            Teacher teacher = controller.FindTeacher(id);
+            if (teacher == null)
+            {
+                return HttpNotFound();
+            }
+            return View(teacher);
+        }
+
+        // POST: Teacher/Delete/{id}
+        [HttpPost, ActionName("Delete")]
+        [ValidateAntiForgeryToken]
+        public ActionResult DeleteConfirmed(int id)
+        {
+            TeacherDataController controller = new TeacherDataController();
+            controller.DeleteTeacher(id);
+            return RedirectToAction("List");
+        }
+
     }
 }

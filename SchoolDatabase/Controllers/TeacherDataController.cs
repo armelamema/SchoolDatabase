@@ -13,7 +13,6 @@ namespace SchoolDatabase.Controllers
     public class TeacherDataController : ApiController
     {
         private SchoolDbContext Blog = new SchoolDbContext();
-
         /// <summary>
         /// Returns a list of Teachers in the system
         /// </summary>
@@ -24,37 +23,32 @@ namespace SchoolDatabase.Controllers
         [HttpGet]
         public IEnumerable<Teacher> ListTeachers()
         {
-            MySqlConnection Conn = Blog.AccessDatabase();
-            Conn.Open();
-            MySqlCommand cmd = Conn.CreateCommand();
-            cmd.CommandText = "Select * from teachers";
-            MySqlDataReader ResultSet = cmd.ExecuteReader();
-            List<Teacher> Teachers = new List<Teacher>();
-
-            while (ResultSet.Read())
+            using (MySqlConnection Conn = Blog.AccessDatabase())
             {
-                int TeacherId = (int)ResultSet["teacherid"];
-                string TeacherFname = ResultSet["teacherfname"].ToString();
-                string TeacherLname = ResultSet["teacherlname"].ToString();
-                string EmployeeNumber = ResultSet["employeenumber"].ToString();
-                string HireDate = ResultSet["hiredate"].ToString();
-                string Salary = ResultSet["salary"].ToString();
-
-
-                Teacher NewTeacher = new Teacher();
-                NewTeacher.TeacherId = TeacherId;
-                NewTeacher.TeacherFname = TeacherFname;
-                NewTeacher.TeacherLname = TeacherLname;
-                NewTeacher.EmployeeNumber = EmployeeNumber;
-                NewTeacher.HireDate = HireDate;
-                NewTeacher.Salary = Salary;
-
-
-                Teachers.Add(NewTeacher);
+                Conn.Open();
+                using (MySqlCommand cmd = Conn.CreateCommand())
+                {
+                    cmd.CommandText = "SELECT * FROM teachers";
+                    using (MySqlDataReader ResultSet = cmd.ExecuteReader())
+                    {
+                        List<Teacher> Teachers = new List<Teacher>();
+                        while (ResultSet.Read())
+                        {
+                            Teacher NewTeacher = new Teacher
+                            {
+                                TeacherId = (int)ResultSet["teacherid"],
+                                TeacherFname = ResultSet["teacherfname"].ToString(),
+                                TeacherLname = ResultSet["teacherlname"].ToString(),
+                                EmployeeNumber = ResultSet["employeenumber"].ToString(),
+                                HireDate = ResultSet["hiredate"].ToString(),
+                                Salary = ResultSet["salary"].ToString()
+                            };
+                            Teachers.Add(NewTeacher);
+                        }
+                        return Teachers;
+                    }
+                }
             }
-
-            Conn.Close();
-            return Teachers;
         }
 
         /// <summary>
@@ -65,34 +59,90 @@ namespace SchoolDatabase.Controllers
         [HttpGet]
         public Teacher FindTeacher(int id)
         {
-            Teacher NewTeacher = new Teacher();
-            MySqlConnection Conn = Blog.AccessDatabase();
-            Conn.Open();
-            MySqlCommand cmd = Conn.CreateCommand();
-            cmd.CommandText = "Select * from teachers where teacherid = @id";
-            cmd.Parameters.AddWithValue("@id", id);
-            MySqlDataReader ResultSet = cmd.ExecuteReader();
-
-            while (ResultSet.Read())
+            Teacher NewTeacher = null;
+            using (MySqlConnection Conn = Blog.AccessDatabase())
             {
-                int TeacherId = (int)ResultSet["teacherid"];
-                string TeacherFname = ResultSet["teacherfname"].ToString();
-                string TeacherLname = ResultSet["teacherlname"].ToString();
-                string EmployeeNumber = ResultSet["employeenumber"].ToString();
-                string HireDate = ResultSet["hiredate"].ToString();
-                string Salary = ResultSet["salary"].ToString();
-
-
-                NewTeacher.TeacherId = TeacherId;
-                NewTeacher.TeacherFname = TeacherFname;
-                NewTeacher.TeacherLname = TeacherLname;
-                NewTeacher.EmployeeNumber = EmployeeNumber;
-                NewTeacher.HireDate = HireDate;
-                NewTeacher.Salary = Salary;
+                Conn.Open();
+                using (MySqlCommand cmd = Conn.CreateCommand())
+                {
+                    cmd.CommandText = "SELECT * FROM teachers WHERE teacherid = @id";
+                    cmd.Parameters.AddWithValue("@id", id);
+                    using (MySqlDataReader ResultSet = cmd.ExecuteReader())
+                    {
+                        if (ResultSet.Read())
+                        {
+                            NewTeacher = new Teacher
+                            {
+                                TeacherId = (int)ResultSet["teacherid"],
+                                TeacherFname = ResultSet["teacherfname"].ToString(),
+                                TeacherLname = ResultSet["teacherlname"].ToString(),
+                                EmployeeNumber = ResultSet["employeenumber"].ToString(),
+                                HireDate = ResultSet["hiredate"].ToString(),
+                                Salary = ResultSet["salary"].ToString()
+                            };
+                        }
+                    }
+                }
             }
-
-            Conn.Close();
             return NewTeacher;
         }
+
+        /// <summary>
+        /// Adds a new teacher to the database
+        /// </summary>
+        /// <param name="newTeacher">The teacher object to be added</param>
+        /// <returns>HTTP response message indicating success or failure</returns>
+        [HttpPost]
+        public IHttpActionResult AddTeacher(Teacher newTeacher)
+        {
+            if (!ModelState.IsValid)
+                return BadRequest(ModelState);
+
+            using (MySqlConnection Conn = Blog.AccessDatabase())
+            {
+                Conn.Open();
+                using (MySqlCommand cmd = Conn.CreateCommand())
+                {
+                    cmd.CommandText = "INSERT INTO teachers (teacherfname, teacherlname, employeenumber, hiredate, salary) VALUES (@TeacherFname, @TeacherLname, @EmployeeNumber, @HireDate, @Salary)";
+                    cmd.Parameters.AddWithValue("@TeacherFname", newTeacher.TeacherFname);
+                    cmd.Parameters.AddWithValue("@TeacherLname", newTeacher.TeacherLname);
+                    cmd.Parameters.AddWithValue("@EmployeeNumber", newTeacher.EmployeeNumber);
+                    cmd.Parameters.AddWithValue("@HireDate", newTeacher.HireDate);
+                    cmd.Parameters.AddWithValue("@Salary", newTeacher.Salary);
+
+                    int rowsAffected = cmd.ExecuteNonQuery();
+                    if (rowsAffected > 0)
+                        return Ok(); // Success response
+                    else
+                        return BadRequest("Failed to add teacher."); // Error response
+                }
+            }
+        }
+
+        /// <summary>
+        /// Deletes a teacher from the database
+        /// </summary>
+        /// <param name="id">The teacher ID to be deleted</param>
+        /// <returns>HTTP response message indicating success or failure</returns>
+        [HttpDelete]
+        public IHttpActionResult DeleteTeacher(int id)
+        {
+            using (MySqlConnection Conn = Blog.AccessDatabase())
+            {
+                Conn.Open();
+                using (MySqlCommand cmd = Conn.CreateCommand())
+                {
+                    cmd.CommandText = "DELETE FROM teachers WHERE teacherid = @id";
+                    cmd.Parameters.AddWithValue("@id", id);
+
+                    int rowsAffected = cmd.ExecuteNonQuery();
+                    if (rowsAffected > 0)
+                        return Ok(); // Success response
+                    else
+                        return NotFound(); // Not found response
+                }
+            }
+        }
     }
-}
+        }
+    
