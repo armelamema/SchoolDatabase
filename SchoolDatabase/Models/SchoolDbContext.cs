@@ -1,6 +1,7 @@
 ﻿using MySql.Data.MySqlClient;
 using System.Data.SqlClient;
 using MySql.Data.MySqlClient;
+using System;
 
 namespace SchoolDatabase.Models
 {
@@ -25,9 +26,21 @@ namespace SchoolDatabase.Models
             }
         }
 
+        public object Teacher { get; internal set; }
+
         public MySqlConnection AccessDatabase()
         {
             return new MySqlConnection(ConnectionString);
+        }
+
+        internal void SaveChanges()
+        {
+            throw new NotImplementedException();
+        }
+
+        internal object Entry(Teacher teacher)
+        {
+            throw new NotImplementedException();
         }
     }
 }

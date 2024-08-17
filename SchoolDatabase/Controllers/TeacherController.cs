@@ -34,7 +34,7 @@ namespace SchoolDatabase.Controllers
         // GET: Teacher/New
         public ActionResult New()
         {
-            // You can pass any necessary data to the view if needed
+          
             return View();
         }
 
@@ -59,6 +59,44 @@ namespace SchoolDatabase.Controllers
             controller.DeleteTeacher(id);
             return RedirectToAction("List");
         }
+       
+        namespace SchoolDatabase.Controllers
+        {
+        public class TeacherController : Controller
+        {
+            private readonly SchoolDbContext _context;
 
-    }
-}
+            public TeacherController(SchoolDbContext context)
+            {
+                _context = context;
+            }
+            // GET: Teacher/Update/{id}
+            public ActionResult Update(int id)
+            {
+                Teacher teacher = _context.Teacher.Find(id);
+                if (teacher == null)
+                {
+                    return HttpNotFound();
+                }
+                return View(teacher);
+            }
+
+            // POST: Teacher/Update/{id}
+            [HttpPost]
+            [ValidateAntiForgeryToken]
+            public ActionResult Update(Teacher teacher)
+            {
+                if (ModelState.IsValid)
+                {
+                    _context.Entry(teacher).State = EntityState.Modified;
+                    _context.SaveChanges();
+                    return RedirectToAction("List");
+                }
+                return View(teacher);
+            }
+        }
+
+        internal class EntityState
+        {
+            internal static object Modified;
+        }

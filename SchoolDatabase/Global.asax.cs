@@ -11,6 +11,8 @@ namespace SchoolDatabase
         {
             AreaRegistration.RegisterAllAreas();
             RouteConfig.RegisterRoutes(RouteTable.Routes);
+            WebApiConfig.Register(GlobalConfiguration.Configuration);
+            BundleConfig.RegisterBundles(BundleTable.Bundles);
         }
     }
 }

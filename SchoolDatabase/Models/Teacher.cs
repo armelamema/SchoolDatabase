@@ -10,4 +10,5 @@
         public string Salary { get; set; }
 
     }
+
 }

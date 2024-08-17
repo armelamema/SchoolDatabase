@@ -218,6 +218,7 @@
     <Compile Include="Models\SchoolDbContext.cs" />
     <Compile Include="Models\Teacher.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
+    <Compile Include="System\Data\Entity.cs" />
   </ItemGroup>
   <ItemGroup>
     <Content Include="Areas\HelpPage\HelpPage.css" />
@@ -287,6 +288,7 @@
     <Content Include="Views\Teacher\show.cshtml" />
     <Content Include="Views\Teacher\List.cshtml" />
     <Content Include="Views\Teacher\New.cshtml" />
+    <Content Include="Views\Teacher\Update.cshtml" />
   </ItemGroup>
   <ItemGroup>
     <Folder Include="App_Data\" />

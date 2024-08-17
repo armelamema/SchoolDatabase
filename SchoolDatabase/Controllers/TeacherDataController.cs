@@ -13,13 +13,12 @@ namespace SchoolDatabase.Controllers
     public class TeacherDataController : ApiController
     {
         private SchoolDbContext Blog = new SchoolDbContext();
+
         /// <summary>
         /// Returns a list of Teachers in the system
         /// </summary>
         /// <example>GET api/TeacherData/ListTeachers</example>
-        /// <returns>
-        /// A list of teachers (first names and last names)
-        /// </returns>
+        /// <returns>A list of teachers (first names and last names)</returns>
         [HttpGet]
         public IEnumerable<Teacher> ListTeachers()
         {
@@ -143,6 +142,40 @@ namespace SchoolDatabase.Controllers
                 }
             }
         }
-    }
+
+        /// <summary>
+        /// Updates an existing teacher in the database.
+        /// </summary>
+        /// <param name="id">The ID of the teacher to update</param>
+        /// <param name="updatedTeacher">The updated teacher object</param>
+        /// <returns>HTTP response message indicating success or failure</returns>
+        [HttpPut]
+        public IHttpActionResult UpdateTeacher(int id, [FromBody] Teacher updatedTeacher)
+        {
+            if (!ModelState.IsValid)
+                return BadRequest(ModelState);
+
+            using (MySqlConnection Conn = Blog.AccessDatabase())
+            {
+                Conn.Open();
+                using (MySqlCommand cmd = Conn.CreateCommand())
+                {
+                    cmd.CommandText = "UPDATE teachers SET teacherfname = @TeacherFname, teacherlname = @TeacherLname, employeenumber = @EmployeeNumber, hiredate = @HireDate, salary = @Salary WHERE teacherid = @TeacherId";
+                    cmd.Parameters.AddWithValue("@TeacherFname", updatedTeacher.TeacherFname);
+                    cmd.Parameters.AddWithValue("@TeacherLname", updatedTeacher.TeacherLname);
+                    cmd.Parameters.AddWithValue("@EmployeeNumber", updatedTeacher.EmployeeNumber);
+                    cmd.Parameters.AddWithValue("@HireDate", updatedTeacher.HireDate);
+                    cmd.Parameters.AddWithValue("@Salary", updatedTeacher.Salary);
+                    cmd.Parameters.AddWithValue("@TeacherId", id);
+
+                    int rowsAffected = cmd.ExecuteNonQuery();
+                    if (rowsAffected > 0)
+                        return Ok();
+                    else
+                        return NotFound();
+                }
+            }
         }
-    
+    }
+}
+

@@ -1,0 +1,38 @@
+﻿@model SchoolDatabase.Models.Teacher
+
+@{
+    ViewBag.Title = "Update Teacher";
+}
+
+<h2>@ViewBag.Title</h2>
+
+@using (Html.BeginForm("Update", "Teacher", FormMethod.Post))
+{
+    @Html.AntiForgeryToken()
+    <div class="form-group">
+        @Html.LabelFor(model => model.TeacherFname)
+        @Html.TextBoxFor(model => model.TeacherFname, new { @class = "form-control" })
+        @Html.ValidationMessageFor(model => model.TeacherFname, "", new { @class = "text-danger" })
+    </div>
+    <div class="form-group">
+        @Html.LabelFor(model => model.TeacherLname)
+        @Html.TextBoxFor(model => model.TeacherLname, new { @class = "form-control" })
+        @Html.ValidationMessageFor(model => model.TeacherLname, "", new { @class = "text-danger" })
+    </div>
+    <div class="form-group">
+        @Html.LabelFor(model => model.EmployeeNumber)
+        @Html.TextBoxFor(model => model.EmployeeNumber, new { @class = "form-control" })
+        @Html.ValidationMessageFor(model => model.EmployeeNumber, "", new { @class = "text-danger" })
+    </div>
+    <div class="form-group">
+        @Html.LabelFor(model => model.HireDate)
+        @Html.TextBoxFor(model => model.HireDate, "{0:yyyy-MM-dd}", new { @class = "form-control", type = "date" })
+        @Html.ValidationMessageFor(model => model.HireDate, "", new { @class = "text-danger" })
+    </div>
+    <div class="form-group">
+        @Html.LabelFor(model => model.Salary)
+        @Html.TextBoxFor(model => model.Salary, "{0:F2}", new { @class = "form-control", type = "number", step = "0.01" })
+        @Html.ValidationMessageFor(model => model.Salary, "", new { @class = "text-danger" })
+    </div>
+    <button type="submit" class="btn btn-primary">Update Teacher</button>
+}
