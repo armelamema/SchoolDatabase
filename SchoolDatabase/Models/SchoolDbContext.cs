@@ -13,7 +13,7 @@ namespace SchoolDatabase.Models
         private static string Server { get { return "localhost"; } }
         private static string Port { get { return "3306"; } }
 
-        protected static string ConnectionString
+        protected static string ConnectionString 
         {
             get
             {

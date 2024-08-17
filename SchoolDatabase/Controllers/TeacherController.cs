@@ -99,4 +99,4 @@ namespace SchoolDatabase.Controllers
         internal class EntityState
         {
             internal static object Modified;
-        }
+        } 
